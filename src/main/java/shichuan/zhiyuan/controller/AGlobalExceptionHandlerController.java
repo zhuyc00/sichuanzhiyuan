@@ -25,7 +25,7 @@ public class AGlobalExceptionHandlerController extends ABaseController {
         logger.error("请求错误，错误地址{},错误信息：", request.getRequestURL(), e);
         ResponseVO ajaxResponse = new ResponseVO();
         if (e instanceof NoHandlerFoundException) {
-            ajaxResponse.setDate(ResponseCodeEnum.CODE_404.getCode());
+            ajaxResponse.setData(ResponseCodeEnum.CODE_404.getCode());
             ajaxResponse.setInfo(ResponseCodeEnum.CODE_404.getMsg());
             ajaxResponse.setStatus(STATUS_ERROR);
         } else if (e instanceof BusinessException) {

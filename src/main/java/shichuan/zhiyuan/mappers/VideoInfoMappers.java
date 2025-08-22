@@ -1,5 +1,6 @@
 package shichuan.zhiyuan.mappers;
 
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -7,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
  * @date:2025-08-22
  * @author: liujun
  */
+@Mapper
 public interface VideoInfoMappers<T, P> extends BaseMapper {
 
 	/**
