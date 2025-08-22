@@ -1,2 +1,2 @@
 # sichuanzhiyuan
-志愿
+志愿四川
