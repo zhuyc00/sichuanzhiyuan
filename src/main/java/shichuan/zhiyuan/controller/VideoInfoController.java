@@ -114,7 +114,7 @@ public class VideoInfoController extends ABaseController {
 			file.transferTo(dest);
 
 			// 构建访问URL
-			String videoUrl = "/videoInfo/display1/" + storedFileName.replace(fileExtension, "");
+			String videoUrl = storedFileName.replace(fileExtension, "");
 			return ResponseEntity.ok(videoUrl);
 		} catch (IOException e) {
 			e.printStackTrace();
