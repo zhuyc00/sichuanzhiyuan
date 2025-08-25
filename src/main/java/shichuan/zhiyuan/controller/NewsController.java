@@ -5,6 +5,7 @@ import org.springframework.web.multipart.MultipartFile;
 import shichuan.zhiyuan.entity.po.News;
 import shichuan.zhiyuan.entity.query.NewsQuery;
 import shichuan.zhiyuan.entity.vo.ResponseVO;
+import shichuan.zhiyuan.exception.BusinessException;
 import shichuan.zhiyuan.service.NewsService;
 
 import javax.annotation.Resource;
@@ -47,18 +48,18 @@ public class NewsController extends ABaseController {
 
 	// 新增图片上传接口
 	@PostMapping("/uploadImage")
-	public ResponseVO uploadImage(@RequestParam("file") MultipartFile file) {
+	public ResponseVO uploadImage(@RequestParam("file") MultipartFile file) throws BusinessException {
 		try {
 			ensureImageDirExists();
 
 			if (file.isEmpty()) {
-				throw new RuntimeException("请选择要上传的图片");
+				return getBusinessErrorResponseVO(new BusinessException(500, "请选择要上传的图片") );
 			}
 
 			// 验证图片类型
 			String contentType = file.getContentType();
 			if (contentType == null || !contentType.startsWith("image/")) {
-				throw new RuntimeException("仅支持图片格式（JPEG/PNG/GIF等）");
+				return getBusinessErrorResponseVO(new BusinessException(500, "仅支持图片格式（JPEG/PNG/GIF等）"));
 			}
 
 			// 生成唯一文件名
@@ -71,12 +72,11 @@ public class NewsController extends ABaseController {
 			file.transferTo(dest);
 
 			// 返回相对访问路径
-			String imageUrl = "/news/displayImage/" + storedFileName;
+			String imageUrl = storedFileName;
 			return getSuccessResponseVO(imageUrl);
 
 		} catch (IOException e) {
-			e.printStackTrace();
-			throw new RuntimeException("图片上传失败: " + e.getMessage());
+			throw new BusinessException(e);
 		}
 	}
 

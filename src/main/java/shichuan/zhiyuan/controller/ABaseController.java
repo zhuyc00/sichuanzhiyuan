@@ -3,11 +3,12 @@ package shichuan.zhiyuan.controller;
 import shichuan.zhiyuan.entity.vo.ResponseVO;
 
 import shichuan.zhiyuan.enums.ResponseCodeEnum;
+import shichuan.zhiyuan.exception.BusinessException;
 
 public class ABaseController {
     protected static final String STATUS_SUCCESS = "success";
     protected static final String STATUS_ERROR = "error";
-
+    protected static final String STATUC_ERROR = "error";
     protected <T> ResponseVO getSuccessResponseVO(T t) {
         ResponseVO<T> responseVO = new ResponseVO<>();
         responseVO.setStatus(STATUS_SUCCESS);
@@ -15,5 +16,27 @@ public class ABaseController {
         responseVO.setInfo(ResponseCodeEnum.CODE_200.getMsg());
         responseVO.setData(t);
         return responseVO;
+    }
+
+
+    protected <T> ResponseVO getBusinessErrorResponseVO(BusinessException e) {
+        ResponseVO vo = new ResponseVO();
+        vo.setStatus(STATUC_ERROR);
+        if (e.getCode() == null) {
+            vo.setCode(ResponseCodeEnum.CODE_600.getCode());
+        } else {
+            vo.setCode(e.getCode());
+        }
+        vo.setInfo(e.getMessage());
+        return vo;
+    }
+
+    protected <T> ResponseVO getServerErrorResponseVO(T t) {
+        ResponseVO vo = new ResponseVO();
+        vo.setStatus(STATUC_ERROR);
+        vo.setCode(ResponseCodeEnum.CODE_500.getCode());
+        vo.setInfo(ResponseCodeEnum.CODE_500.getMsg());
+        vo.setData(t);
+        return vo;
     }
 }
