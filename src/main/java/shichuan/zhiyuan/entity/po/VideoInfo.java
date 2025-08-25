@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * @Description:
- * @date:2025-08-22
+ * @date:2025-08-24
  * @author: liujun
  */
 public class VideoInfo implements Serializable {
@@ -37,16 +37,18 @@ public class VideoInfo implements Serializable {
 	private String videoUrl;
 
 	/**
-	 * 
-	 */
-	private Integer duration;
-
-	/**
-	 * 
+	 * 创建时间（自动生成）
 	 */
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-	private Date publishTime;
+	private Date createTime;
+
+	/**
+	 * 更新时间（自动更新）
+	 */
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date updateTime;
 
 
 	public void setId(Integer id) {
@@ -69,12 +71,12 @@ public class VideoInfo implements Serializable {
 		this.videoUrl = videoUrl;
 	}
 
-	public void setDuration(Integer duration) {
-		this.duration = duration;
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 
-	public void setPublishTime(Date publishTime) {
-		this.publishTime = publishTime;
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
 	}
 
 	public Integer getId() {
@@ -97,16 +99,16 @@ public class VideoInfo implements Serializable {
 		return this.videoUrl;
 	}
 
-	public Integer getDuration() {
-		return this.duration;
+	public Date getCreateTime() {
+		return this.createTime;
 	}
 
-	public Date getPublishTime() {
-		return this.publishTime;
+	public Date getUpdateTime() {
+		return this.updateTime;
 	}
 
 	@Override
 	public String toString() {
-		return "ID:" + (id == null ? "null" : id) + ",:" + (title == null ? "null" : title) + ",:" + (description == null ? "null" : description) + ",:" + (category == null ? "null" : category) + ",URL:" + (videoUrl == null ? "null" : videoUrl) + ",:" + (duration == null ? "null" : duration) + ",:" + (publishTime == null ? "null" : publishTime);
+		return "ID:" + (id == null ? "null" : id) + ",:" + (title == null ? "null" : title) + ",:" + (description == null ? "null" : description) + ",:" + (category == null ? "null" : category) + ",URL:" + (videoUrl == null ? "null" : videoUrl) + ",创建时间（自动生成）:" + (createTime == null ? "null" : createTime) + ",更新时间（自动更新）:" + (updateTime == null ? "null" : updateTime);
 	}
 }

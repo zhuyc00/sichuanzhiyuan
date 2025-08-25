@@ -14,16 +14,16 @@
 		<result column="category" property="category"/>
 		<!-- URL -->
 		<result column="video_url" property="videoUrl"/>
-		<!--  -->
-		<result column="duration" property="duration"/>
-		<!--  -->
-		<result column="publish_time" property="publishTime"/>
+		<!-- 创建时间（自动生成） -->
+		<result column="create_time" property="createTime"/>
+		<!-- 更新时间（自动更新） -->
+		<result column="update_time" property="updateTime"/>
 
 	</resultMap>
 
 	<!--通用查询列-->
 	<sql id="base_column_list">
-		id,title,description,category,video_url,duration,publish_time
+		id,title,description,category,video_url,create_time,update_time
 	</sql>
 
 	<!--基础查询条件-->
@@ -44,11 +44,11 @@
 		<if test="query.videoUrl!=null and query.videoUrl!=''">
 			and video_url = #{query.videoUrl}
 		</if>
-		<if test="query.duration!=null">
-			and duration = #{query.duration}
+		<if test="query.createTime!=null">
+			and create_time = #{query.createTime}
 		</if>
-		<if test="query.publishTime!=null">
-			and publish_time = #{query.publishTime}
+		<if test="query.updateTime!=null">
+			and update_time = #{query.updateTime}
 		</if>
 	</sql>
 
@@ -66,11 +66,17 @@
 		<if test="query.videoUrlFuzzy!=null and query.videoUrlFuzzy!=''">
 			and video_url like concat ('%', #{query.videoUrlFuzzy}, '%')
 		</if>
-		<if test="query.publishTimeStart!=null and query.publishTimeStart!=''">
-			<![CDATA[ and publish_time>=str_to_date(#{query.publishTimeStart}, '%Y-%m-%d') ]]>
+		<if test="query.createTimeStart!=null and query.createTimeStart!=''">
+			<![CDATA[ and create_time>=str_to_date(#{query.createTimeStart}, '%Y-%m-%d') ]]>
 		</if>
-		<if test="query.publishTimeEnd!=null and query.publishTimeEnd!=''">
-			<![CDATA[ and publish_time< date_sub(str_to_date(#{query.publishTimeEnd},'%Y-%m-%d')，interval -1 day) ]]>
+		<if test="query.createTimeEnd!=null and query.createTimeEnd!=''">
+			<![CDATA[ and create_time< date_sub(str_to_date(#{query.createTimeEnd},'%Y-%m-%d')，interval -1 day) ]]>
+		</if>
+		<if test="query.updateTimeStart!=null and query.updateTimeStart!=''">
+			<![CDATA[ and update_time>=str_to_date(#{query.updateTimeStart}, '%Y-%m-%d') ]]>
+		</if>
+		<if test="query.updateTimeEnd!=null and query.updateTimeEnd!=''">
+			<![CDATA[ and update_time< date_sub(str_to_date(#{query.updateTimeEnd},'%Y-%m-%d')，interval -1 day) ]]>
 		</if>
 
 	</sql>
@@ -84,14 +90,19 @@
 	</sql>
 
 	<!--查询列表-->
-	<select id = "selectList" resultMap="base_result_map">
+	<select id="selectList" resultMap="base_result_map">
 		SELECT
 		<include refid="base_column_list"/>
 		FROM video_info
 		<include refid="query_condition"/>
-		<if test="query.orderBy!=null">order by ${query.orderBy}</if>
-		<if test="query.simplePage!=null">limit #{query.simplePage.start},#{query.simplePage.end}</if>
+		<if test="query.orderBy != null and query.orderBy != ''">
+			ORDER BY ${query.orderBy}
+		</if>
+		<if test="query.simplePage != null">
+			LIMIT #{query.simplePage.start},#{query.simplePage.end}
+		</if>
 	</select>
+
 
 	<!--查询数量-->
 	<select id = "selectCount" resultType="java.lang.Integer">
@@ -121,11 +132,11 @@
 			<if test="bean.videoUrl != null">
 				video_url,
 			</if>
-			<if test="bean.duration != null">
-				duration,
+			<if test="bean.createTime != null">
+				create_time,
 			</if>
-			<if test="bean.publishTime != null">
-				publish_time,
+			<if test="bean.updateTime != null">
+				update_time,
 			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -144,11 +155,11 @@
 			<if test="bean.videoUrl != null">
 				#{bean.videoUrl},
 			</if>
-			<if test="bean.duration != null">
-				#{bean.duration},
+			<if test="bean.createTime != null">
+				#{bean.createTime},
 			</if>
-			<if test="bean.publishTime != null">
-				#{bean.publishTime},
+			<if test="bean.updateTime != null">
+				#{bean.updateTime},
 			</if>
 		</trim>
 	</insert>
@@ -172,11 +183,11 @@
 			<if test="bean.videoUrl != null">
 				video_url,
 			</if>
-			<if test="bean.duration != null">
-				duration,
+			<if test="bean.createTime != null">
+				create_time,
 			</if>
-			<if test="bean.publishTime != null">
-				publish_time,
+			<if test="bean.updateTime != null">
+				update_time,
 			</if>
 		</trim>
 		<trim prefix="values (" suffix=")" suffixOverrides=",">
@@ -195,11 +206,11 @@
 			<if test="bean.videoUrl != null">
 				#{bean.videoUrl},
 			</if>
-			<if test="bean.duration != null">
-				#{bean.duration},
+			<if test="bean.createTime != null">
+				#{bean.createTime},
 			</if>
-			<if test="bean.publishTime != null">
-				#{bean.publishTime},
+			<if test="bean.updateTime != null">
+				#{bean.updateTime},
 			</if>
 		</trim>
 		on DUPLICATE key update
@@ -216,31 +227,31 @@
 			<if test="bean.videoUrl != null">
 				 video_url = VALUES(video_url)
 			</if>
-			<if test="bean.duration != null">
-				 duration = VALUES(duration)
+			<if test="bean.createTime != null">
+				 create_time = VALUES(create_time)
 			</if>
-			<if test="bean.publishTime != null">
-				 publish_time = VALUES(publish_time)
+			<if test="bean.updateTime != null">
+				 update_time = VALUES(update_time)
 			</if>
 		</trim>
 	</insert>
 
 	<!-- 批量插入 -->
 	<insert id ="insertBatch" parameterType="shichuan.zhiyuan.entity.po.VideoInfo">
-		INSERT INTO video_info(title,description,category,video_url,duration,publish_time) VALUES
+		INSERT INTO video_info(title,description,category,video_url,create_time,update_time) VALUES
 		<foreach collection="list" item="item" separator=",">
-			(#{item.title},#{item.description},#{item.category},#{item.videoUrl},#{item.duration},#{item.publishTime})
+			(#{item.title},#{item.description},#{item.category},#{item.videoUrl},#{item.createTime},#{item.updateTime})
 		</foreach>
 	</insert>
 
 	<!-- 批量插入（或者更新） -->
 	<insert id ="insertOrUpdateBatch" parameterType="shichuan.zhiyuan.entity.po.VideoInfo">
-		INSERT INTO video_info(title,description,category,video_url,duration,publish_time) VALUES
+		INSERT INTO video_info(title,description,category,video_url,create_time,update_time) VALUES
 		<foreach collection="list" item="item" separator="," >
-			(#{item.title},#{item.description},#{item.category},#{item.videoUrl},#{item.duration},#{item.publishTime})
+			(#{item.title},#{item.description},#{item.category},#{item.videoUrl},#{item.createTime},#{item.updateTime})
 		</foreach>
 			on DUPLICATE key update
-			title= VALUES(title),description= VALUES(description),category= VALUES(category),video_url= VALUES(video_url),duration= VALUES(duration),publish_time= VALUES(publish_time)
+			title= VALUES(title),description= VALUES(description),category= VALUES(category),video_url= VALUES(video_url),create_time= VALUES(create_time),update_time= VALUES(update_time)
 	</insert>
 
 	<!-- 根据Id查询 -->
@@ -267,11 +278,11 @@
 			<if test="bean.videoUrl != null">
 				video_url = #{bean.videoUrl},
 			</if>
-			<if test="bean.duration != null">
-				duration = #{bean.duration},
+			<if test="bean.createTime != null">
+				create_time = #{bean.createTime},
 			</if>
-			<if test="bean.publishTime != null">
-				publish_time = #{bean.publishTime},
+			<if test="bean.updateTime != null">
+				update_time = #{bean.updateTime},
 			</if>
 		</set>
 		where id=#{id}

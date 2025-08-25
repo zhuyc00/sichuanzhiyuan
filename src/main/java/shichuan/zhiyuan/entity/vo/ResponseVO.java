@@ -34,7 +34,7 @@ public class ResponseVO<T> {
         return data;
     }
 
-    public void setData(T date) {
+    public void setData(T data) {
         this.data = data;
     }
 }

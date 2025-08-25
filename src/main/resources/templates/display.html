@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>视频上传与元数据管理系统</title>
+  <style>
+    :root {
+      --primary-color: #3498db;
+      --secondary-color: #2ecc71;
+      --accent-color: #e74c3c;
+      --dark-color: #2c3e50;
+      --light-color: #ecf0f1;
+      --text-color: #333;
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+      color: var(--text-color);
+      line-height: 1.6;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.97);
+      border-radius: 15px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    header {
+      background: var(--dark-color);
+      color: white;
+      padding: 25px;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+
+    .content {
+      display: flex;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .upload-section, .player-section {
+      flex: 1;
+      padding: 25px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+
+    h2 {
+      color: var(--dark-color);
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--primary-color);
+    }
+
+    .metadata-form {
+      margin-bottom: 25px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+    }
+
+    input, textarea, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary-color);
+      outline: none;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .upload-area {
+      border: 3px dashed var(--primary-color);
+      border-radius: 8px;
+      padding: 30px;
+      text-align: center;
+      margin-bottom: 20px;
+      transition: all 0.3s;
+      background-color: #f8f9fa;
+    }
+
+    .upload-area:hover {
+      background-color: #e8f4fc;
+      border-color: #2980b9;
+    }
+
+    .upload-area.dragover {
+      background-color: #d6eaf8;
+      border-color: #2980b9;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .browse-btn {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s;
+      margin-top: 15px;
+    }
+
+    .browse-btn:hover {
+      background-color: #2980b9;
+    }
+
+    .upload-btn {
+      background-color: var(--secondary-color);
+      color: white;
+      padding: 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 18px;
+      width: 100%;
+      margin-top: 15px;
+      transition: background-color 0.3s;
+    }
+
+    .upload-btn:hover {
+      background-color: #27ae60;
+    }
+
+    .upload-btn:disabled {
+      background-color: #95a5a6;
+      cursor: not-allowed;
+    }
+
+    .file-info {
+      margin-top: 15px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 5px;
+      display: none;
+    }
+
+    .progress-container {
+      margin-top: 20px;
+      display: none;
+    }
+
+    .progress-bar {
+      height: 25px;
+      background-color: #ecf0f1;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+      width: 0%;
+      transition: width 0.3s;
+    }
+
+    .status {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+      font-size: 16px;
+    }
+
+    .success {
+      color: #27ae60;
+    }
+
+    .error {
+      color: var(--accent-color);
+    }
+
+    .player-container {
+      margin-top: 20px;
+    }
+
+    video {
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      background: #000;
+    }
+
+    .video-controls {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .control-btn {
+      padding: 10px 15px;
+      background: var(--primary-color);
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .control-btn:hover {
+      background: #2980b9;
+    }
+
+    .video-list {
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 10px;
+    }
+
+    .video-item {
+      padding: 10px;
+      border-bottom: 1px solid #eee;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .video-item:hover {
+      background: #f8f9fa;
+    }
+
+    .video-item:last-child {
+      border-bottom: none;
+    }
+
+    .video-details {
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-radius: 8px;
+    }
+
+    .detail-row {
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .detail-label {
+      font-weight: bold;
+      min-width: 100px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: white;
+      background: var(--dark-color);
+      margin-top: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .content {
+        flex-direction: column;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>视频上传与元数据管理系统</h1>
+    <p class="subtitle">完善元数据信息并上传您的视频内容</p>
+  </header>
+
+  <div class="content">
+    <div class="upload-section">
+      <h2>视频上传</h2>
+
+      <div class="metadata-form">
+        <h3>元数据信息</h3>
+
+        <div class="form-group">
+          <label for="title">标题 *</label>
+          <input type="text" id="title" placeholder="输入视频标题" required>
+        </div>
+
+        <div class="form-group">
+          <label for="description">描述</label>
+          <textarea id="description" placeholder="输入视频描述"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="category">分类 *</label>
+          <select id="category" required>
+            <option value="">选择分类</option>
+            <option value="education">教育</option>
+            <option value="entertainment">娱乐</option>
+            <option value="sports">体育</option>
+            <option value="news">新闻</option>
+            <option value="technology">科技</option>
+            <option value="music">音乐</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="publishTime">发布时间</label>
+          <input type="datetime-local" id="publishTime">
+        </div>
+      </div>
+
+      <div class="upload-area" id="uploadArea">
+        <svg xmlns="http://www.w3.org/2000/svg" width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#3498db" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+          <polyline points="17 8 12 3 7 8"></polyline>
+          <line x1="12" y1="3" x2="12" y2="15"></line>
+        </svg>
+        <p>将视频文件拖放到此处或</p>
+        <input type="file" id="fileInput" class="file-input" accept="video/*">
+        <button class="browse-btn" onclick="document.getElementById('fileInput').click()">选择视频文件</button>
+        <div class="file-info" id="fileInfo"></div>
+      </div>
+
+      <div class="progress-container" id="progressContainer">
+        <div class="progress-bar">
+          <div class="progress" id="progress"></div>
+        </div>
+        <div class="status" id="status"></div>
+      </div>
+
+      <button class="upload-btn" id="uploadBtn" disabled>上传视频</button>
+    </div>
+
+    <div class="player-section">
+      <h2>视频播放与管理</h2>
+
+      <div class="player-container">
+        <video id="videoPlayer" controls>
+          <source src="" type="video/mp4">
+          您的浏览器不支持HTML5视频播放
+        </video>
+
+        <div class="video-controls">
+          <button class="control-btn" onclick="playPause()">播放/暂停</button>
+          <button class="control-btn" onclick="muteUnmute()">静音/取消静音</button>
+          <button class="control-btn" onclick="fullScreen()">全屏</button>
+          <button class="control-btn" onclick="skipBack()">后退10秒</button>
+          <button class="control-btn" onclick="skipAhead()">前进10秒</button>
+        </div>
+      </div>
+
+      <div class="video-details">
+        <h3>视频元数据</h3>
+        <div class="detail-row">
+          <span class="detail-label">ID:</span>
+          <span id="meta-id">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">标题:</span>
+          <span id="meta-title">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">描述:</span>
+          <span id="meta-description">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">分类:</span>
+          <span id="meta-category">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">时长:</span>
+          <span id="meta-duration">-</span>
+        </div>
+        <div class="detail-row">
+          <span class="detail-label">发布时间:</span>
+          <span id="meta-publish-time">-</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <p>© 2023 视频上传与元数据管理系统 | 技术支持: Spring Boot & HTML5</p>
+  </footer>
+</div>
+
+<script>
+  const uploadArea = document.getElementById('uploadArea');
+  const fileInput = document.getElementById('fileInput');
+  const fileInfo = document.getElementById('fileInfo');
+  const uploadBtn = document.getElementById('uploadBtn');
+  const progressContainer = document.getElementById('progressContainer');
+  const progress = document.getElementById('progress');
+  const status = document.getElementById('status');
+  const videoPlayer = document.getElementById('videoPlayer');
+
+  // 元数据表单元素
+  const titleInput = document.getElementById('title');
+  const descriptionInput = document.getElementById('description');
+  const categoryInput = document.getElementById('category');
+  const publishTimeInput = document.getElementById('publishTime');
+
+  // 元数据显示元素
+  const metaId = document.getElementById('meta-id');
+  const metaTitle = document.getElementById('meta-title');
+  const metaDescription = document.getElementById('meta-description');
+  const metaCategory = document.getElementById('meta-category');
+  const metaDuration = document.getElementById('meta-duration');
+  const metaPublishTime = document.getElementById('meta-publish-time');
+
+  let selectedFile = null;
+  let currentVideoId = null;
+
+  // 设置默认发布时间为当前时间
+  publishTimeInput.value = new Date().toISOString().slice(0, 16);
+
+  // 拖放事件处理
+  uploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadArea.classList.add('dragover');
+  });
+
+  uploadArea.addEventListener('dragleave', () => {
+    uploadArea.classList.remove('dragover');
+  });
+
+  uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadArea.classList.remove('dragover');
+
+    if (e.dataTransfer.files.length) {
+      handleFileSelect(e.dataTransfer.files[0]);
+    }
+  });
+
+  // 文件选择事件处理
+  fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) {
+      handleFileSelect(fileInput.files[0]);
+    }
+  });
+
+  // 处理文件选择
+  function handleFileSelect(file) {
+    // 检查文件类型
+    if (!file.type.startsWith('video/')) {
+      status.textContent = '错误：请选择视频文件';
+      status.className = 'status error';
+      progressContainer.style.display = 'block';
+      return;
+    }
+
+    selectedFile = file;
+    fileInfo.innerHTML = `<strong>选中的文件:</strong> ${file.name} <br><strong>大小:</strong> ${formatFileSize(file.size)} <br><strong>类型:</strong> ${file.type}`;
+    fileInfo.style.display = 'block';
+
+    // 检查元数据表单是否已填写
+    checkFormValidity();
+  }
+
+  // 检查表单有效性
+  function checkFormValidity() {
+    if (selectedFile && titleInput.value && categoryInput.value) {
+      uploadBtn.disabled = false;
+    } else {
+      uploadBtn.disabled = true;
+    }
+  }
+
+  // 为表单元素添加事件监听
+  titleInput.addEventListener('input', checkFormValidity);
+  categoryInput.addEventListener('change', checkFormValidity);
+
+  // 上传按钮点击事件
+  uploadBtn.addEventListener('click', () => {
+    if (!selectedFile || !titleInput.value || !categoryInput.value) return;
+
+    // 创建FormData对象，包含元数据和文件
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('title', titleInput.value);
+    formData.append('description', descriptionInput.value);
+    formData.append('category', categoryInput.value);
+    formData.append('publish_time', publishTimeInput.value);
+
+    progressContainer.style.display = 'block';
+    status.textContent = '上传中...';
+    status.className = 'status';
+
+    const xhr = new XMLHttpRequest();
+
+    // 上传进度事件
+    xhr.upload.addEventListener('progress', (e) => {
+      if (e.lengthComputable) {
+        const percentComplete = (e.loaded / e.total) * 100;
+        progress.style.width = percentComplete + '%';
+      }
+    });
+
+    // 上传完成事件
+    xhr.addEventListener('load', () => {
+      if (xhr.status === 200) {
+        const response = JSON.parse(xhr.responseText);
+        status.textContent = '上传成功！';
+        status.className = 'status success';
+
+        // 显示元数据
+        displayMetadata(response);
+
+        // 播放视频
+        playVideo(response.video_url);
+
+        // 重置表单
+        setTimeout(() => {
+          fileInfo.style.display = 'none';
+          progressContainer.style.display = 'none';
+          progress.style.width = '0%';
+          fileInput.value = '';
+          selectedFile = null;
+          uploadBtn.disabled = true;
+        }, 2000);
+      } else {
+        status.textContent = '上传失败: ' + xhr.responseText;
+        status.className = 'status error';
+      }
+    });
+
+    // 上传错误事件
+    xhr.addEventListener('error', () => {
+      status.textContent = '上传出错，请重试';
+      status.className = 'status error';
+    });
+
+    xhr.open('POST', '/videoInfo/uploadWithMetadata', true);
+    xhr.send(formData);
+  });
+
+  // 显示元数据
+  function displayMetadata(metadata) {
+    metaId.textContent = metadata.id || '-';
+    metaTitle.textContent = metadata.title || '-';
+    metaDescription.textContent = metadata.description || '-';
+    metaCategory.textContent = metadata.category || '-';
+    metaDuration.textContent = metadata.duration ? formatDuration(metadata.duration) : '-';
+    metaPublishTime.textContent = metadata.publish_time ? new Date(metadata.publish_time).toLocaleString() : '-';
+  }
+
+  // 播放视频函数
+  function playVideo(fileName) {
+    // 根据后端接口构造URL
+    const videoUrl = `/videoInfo/display1/${fileName}`;
+    videoPlayer.src = videoUrl;
+    videoPlayer.load();
+    videoPlayer.play();
+  }
+
+  // 播放控制函数
+  function playPause() {
+    if (videoPlayer.paused) {
+      videoPlayer.play();
+    } else {
+      videoPlayer.pause();
+    }
+  }
+
+  function muteUnmute() {
+    videoPlayer.muted = !videoPlayer.muted;
+  }
+
+  function fullScreen() {
+    if (videoPlayer.requestFullscreen) {
+      videoPlayer.requestFullscreen();
+    } else if (videoPlayer.mozRequestFullScreen) {
+      videoPlayer.mozRequestFullScreen();
+    } else if (videoPlayer.webkitRequestFullscreen) {
+      videoPlayer.webkitRequestFullscreen();
+    } else if (videoPlayer.msRequestFullscreen) {
+      videoPlayer.msRequestFullscreen();
+    }
+  }
+
+  function skipBack() {
+    videoPlayer.currentTime -= 10;
+  }
+
+  function skipAhead() {
+    videoPlayer.currentTime += 10;
+  }
+
+  // 格式化文件大小显示
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+
+  // 格式化时长显示
+  function formatDuration(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    } else {
+      return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+  }
+
+  // 初始化示例
+  window.onload = function() {
+    // 显示示例元数据
+    displayMetadata({
+      id: '12345',
+      title: '示例视频',
+      description: '这是一个示例视频的元数据展示',
+      category: '教育',
+      duration: 125,
+      publish_time: '2023-06-15T14:30:00'
+    });
+  };
+</script>
+</body>
+</html>
