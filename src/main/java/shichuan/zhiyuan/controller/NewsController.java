@@ -3,7 +3,10 @@ package shichuan.zhiyuan.controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import shichuan.zhiyuan.entity.po.News;
+import shichuan.zhiyuan.entity.po.VideoInfo;
 import shichuan.zhiyuan.entity.query.NewsQuery;
+import shichuan.zhiyuan.entity.query.VideoInfoQuery;
+import shichuan.zhiyuan.entity.vo.PaginationResultVO;
 import shichuan.zhiyuan.entity.vo.ResponseVO;
 import shichuan.zhiyuan.exception.BusinessException;
 import shichuan.zhiyuan.service.NewsService;
@@ -169,4 +172,9 @@ public class NewsController extends ABaseController {
 		return getSuccessResponseVO(null);
 	}
 
+	@RequestMapping("findByPage")
+	public ResponseVO findByPage(NewsQuery query) {
+		PaginationResultVO<News> result = newsService.findByPage(query);
+		return getSuccessResponseVO(result);
+	}
 }

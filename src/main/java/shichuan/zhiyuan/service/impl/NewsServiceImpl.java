@@ -10,6 +10,7 @@ import shichuan.zhiyuan.mappers.NewsMappers;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.util.List;
 
 /**
@@ -94,10 +95,120 @@ public class NewsServiceImpl implements NewsService {
 	}
 
 	/**
-	 * 根据Id删除
+	 * 根据Id删除（同时删除数据库记录和磁盘图片）
 	 */
+	@Override
 	public Integer deleteById(Integer id) {
-		return this.newsMappers.deleteById(id);
+		// 1. 查询新闻信息
+		News news = this.newsMappers.selectById(id);
+		if (news == null) {
+			return 0;
+		}
+
+		// 2. 删除数据库记录
+		int deleteCount = this.newsMappers.deleteById(id);
+		if (deleteCount <= 0) {
+			return 0;
+		}
+
+		// 3. 处理图片删除
+		String imageUrl = news.getImageUrl();
+		if (imageUrl == null || imageUrl.isEmpty()) {
+			System.out.println("新闻图片URL为空，无需删除文件");
+			return deleteCount;
+		}
+
+		// 4. 解析URL获取文件名
+		String fileName = extractFileNameFromUrl(imageUrl);
+		if (fileName == null) {
+			System.err.println("无法解析图片URL：" + imageUrl);
+			return deleteCount;
+		}
+
+		// 5. 获取图片存储路径
+		String storagePath = getImageStoragePath();
+
+		// 6. 构建完整文件路径（支持多种图片格式）
+		File imageFile = resolveImageFile(storagePath, fileName);
+
+		// 7. 执行文件删除
+		deleteImageFile(imageFile);
+
+		return deleteCount;
+	}
+
+// 新增工具方法 --------------------------------------------------
+	/**
+	 * 从URL中提取文件名（如从"/news/images/xxx"中提取"xxx"）
+	 */
+	private String extractFileNameFromUrl(String imageUrl) {
+		// 示例URL格式: /news/displayImage/abc123.jpg
+		String prefix = "/news/displayImage/";
+
+		// 检查URL是否包含前缀
+		if (imageUrl.startsWith(prefix)) {
+			return imageUrl.substring(prefix.length());
+		}
+
+		// 如果URL是完整路径（如http://example.com/news/displayImage/abc123.jpg）
+		int lastSlashIndex = imageUrl.lastIndexOf("/");
+		if (lastSlashIndex != -1 && lastSlashIndex < imageUrl.length() - 1) {
+			return imageUrl.substring(lastSlashIndex + 1);
+		}
+
+		return null;
+	}
+
+	/**
+	 * 获取图片存储路径
+	 */
+	private String getImageStoragePath() {
+		String os = System.getProperty("os.name").toLowerCase();
+		if (os.contains("win")) {
+			return "D:/news_images/";
+		} else {
+			return "/var/news_images/";
+		}
+	}
+
+	/**
+	 * 解析图片文件对象（支持多格式）
+	 */
+	private File resolveImageFile(String storagePath, String fileName) {
+		// 常见图片扩展名列表
+		String[] extensions = {".jpg", ".jpeg", ".png", ".gif", ".bmp"};
+
+		// 优先检查完整文件名是否包含扩展名
+		if (fileName.contains(".")) {
+			return new File(storagePath + fileName);
+		}
+
+		// 无扩展名时尝试匹配
+		for (String ext : extensions) {
+			File file = new File(storagePath + fileName + ext);
+			if (file.exists()) {
+				return file;
+			}
+		}
+
+		// 默认使用.jpg
+		return new File(storagePath + fileName + ".jpg");
+	}
+
+	/**
+	 * 安全删除图片文件
+	 */
+	private void deleteImageFile(File imageFile) {
+		if (imageFile.exists() && imageFile.isFile()) {
+			boolean deleted = imageFile.delete();
+			if (deleted) {
+				System.out.println("图片删除成功: " + imageFile.getAbsolutePath());
+			} else {
+				System.err.println("图片删除失败（可能无权限）: " + imageFile.getAbsolutePath());
+			}
+		} else {
+			System.err.println("图片文件不存在: " + imageFile.getAbsolutePath());
+		}
 	}
 
 }
