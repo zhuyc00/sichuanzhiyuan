@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
  * @author: liujun
  */
 @Mapper
-public interface VideoInfoMappers<T, P> extends BaseMapper {
+public interface NewsCategoriesMappers<T, P> extends BaseMapper {
 
 	/**
 	 * 根据Id查询
@@ -26,5 +26,4 @@ public interface VideoInfoMappers<T, P> extends BaseMapper {
 	 */
 	Integer deleteById(@Param("id") Integer id);
 
-	Integer getCount();
 }

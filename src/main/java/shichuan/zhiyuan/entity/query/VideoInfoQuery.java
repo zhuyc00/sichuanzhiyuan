@@ -1,10 +1,12 @@
 package shichuan.zhiyuan.entity.query;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.util.Date;
 
 /**
  * @Description:查询对象
- * @date:2025-08-22
+ * @date:2025-08-24
  * @author: liujun
  */
 public class VideoInfoQuery extends BaseQuery{
@@ -42,18 +44,24 @@ public class VideoInfoQuery extends BaseQuery{
 	private String videoUrlFuzzy;
 
 	/**
-	 * 
+	 * 创建时间（自动生成）
 	 */
-	private Integer duration;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date createTime;
+
+	private String createTimeStart;
+
+	private String createTimeEnd;
 
 	/**
-	 * 
+	 * 更新时间（自动更新）
 	 */
-	private Date publishTime;
+	@DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+	private Date updateTime;
 
-	private String publishTimeStart;
+	private String updateTimeStart;
 
-	private String publishTimeEnd;
+	private String updateTimeEnd;
 
 	public void setTitleFuzzy(String titleFuzzy) {
 		this.titleFuzzy = titleFuzzy;
@@ -87,20 +95,36 @@ public class VideoInfoQuery extends BaseQuery{
 		return this.videoUrlFuzzy;
 	}
 
-	public void setPublishTimeStart(String publishTimeStart) {
-		this.publishTimeStart = publishTimeStart;
+	public void setCreateTimeStart(String createTimeStart) {
+		this.createTimeStart = createTimeStart;
 	}
 
-	public String getPublishTimeStart() {
-		return this.publishTimeStart;
+	public String getCreateTimeStart() {
+		return this.createTimeStart;
 	}
 
-	public void setPublishTimeEnd(String publishTimeEnd) {
-		this.publishTimeEnd = publishTimeEnd;
+	public void setCreateTimeEnd(String createTimeEnd) {
+		this.createTimeEnd = createTimeEnd;
 	}
 
-	public String getPublishTimeEnd() {
-		return this.publishTimeEnd;
+	public String getCreateTimeEnd() {
+		return this.createTimeEnd;
+	}
+
+	public void setUpdateTimeStart(String updateTimeStart) {
+		this.updateTimeStart = updateTimeStart;
+	}
+
+	public String getUpdateTimeStart() {
+		return this.updateTimeStart;
+	}
+
+	public void setUpdateTimeEnd(String updateTimeEnd) {
+		this.updateTimeEnd = updateTimeEnd;
+	}
+
+	public String getUpdateTimeEnd() {
+		return this.updateTimeEnd;
 	}
 
 	public void setId(Integer id) {
@@ -143,20 +167,20 @@ public class VideoInfoQuery extends BaseQuery{
 		return this.videoUrl;
 	}
 
-	public void setDuration(Integer duration) {
-		this.duration = duration;
+	public void setCreateTime(Date createTime) {
+		this.createTime = createTime;
 	}
 
-	public Integer getDuration() {
-		return this.duration;
+	public Date getCreateTime() {
+		return this.createTime;
 	}
 
-	public void setPublishTime(Date publishTime) {
-		this.publishTime = publishTime;
+	public void setUpdateTime(Date updateTime) {
+		this.updateTime = updateTime;
 	}
 
-	public Date getPublishTime() {
-		return this.publishTime;
+	public Date getUpdateTime() {
+		return this.updateTime;
 	}
 
 }
