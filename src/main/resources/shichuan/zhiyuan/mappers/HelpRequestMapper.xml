@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="shichuan.zhiyuan.mappers.HelpRequestMapper">
+
+    <!-- 插入一条求助信息 -->
+    <insert id="insert" parameterType="shichuan.zhiyuan.entity.query.HelpRequest" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO help_request (title, description, user_id, create_time)
+        VALUES (#{title}, #{description}, #{userId}, NOW())
+    </insert>
+
+    <!-- 查询所有求助信息 -->
+    <select id="selectAll" resultType="shichuan.zhiyuan.entity.query.HelpRequest">
+        SELECT id, title, description, create_time, user_id
+        FROM help_request
+        ORDER BY create_time DESC
+    </select>
+
+    <!-- 根据ID查询单条 -->
+    <select id="selectById" parameterType="int" resultType="shichuan.zhiyuan.entity.query.HelpRequest">
+        SELECT id, title, description, create_time, user_id
+        FROM help_request
+        WHERE id = #{id}
+    </select>
+
+</mapper>
