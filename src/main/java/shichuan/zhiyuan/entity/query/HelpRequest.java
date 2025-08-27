@@ -15,11 +15,11 @@ public class HelpRequest {
     }
 
     // 全参构造
-    public HelpRequest(Integer id, String title, String description, Integer userId) {
+    public HelpRequest(Integer id, String title,LocalDateTime createTime,String description, Integer userId) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.createTime = LocalDateTime.now();
+        this.createTime = createTime;
         this.userId = userId;
     }
 

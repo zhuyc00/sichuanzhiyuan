@@ -38,6 +38,6 @@ public class HelpRequestController extends ABaseController{
             return getSuccessResponseVO(helpRequest);
         }
 
-        return getSuccessResponseVO("查看求助信息失败");
+        return getServerErrorResponseVO("查找失败");
     }
 }

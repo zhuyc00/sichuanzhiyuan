@@ -11,14 +11,22 @@
 
     <!-- 查询所有求助信息 -->
     <select id="selectAll" resultType="shichuan.zhiyuan.entity.query.HelpRequest">
-        SELECT id, title, description, create_time, user_id
+        SELECT id,
+            title,
+            description,
+            create_time AS createTime,
+            user_id AS userId
         FROM help_request
         ORDER BY create_time DESC
     </select>
 
     <!-- 根据ID查询单条 -->
     <select id="selectById" parameterType="int" resultType="shichuan.zhiyuan.entity.query.HelpRequest">
-        SELECT id, title, description, create_time, user_id
+        SELECT id,
+               title,
+               description,
+               create_time AS createTime,
+               user_id AS userId
         FROM help_request
         WHERE id = #{id}
     </select>
